@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.2] - 2026-06-11
+
+### Fixed
+
+- Eliminate npm peer-dependency warnings on `npx x402-proxy` install. The CLI is fully bundled and needs no runtime dependencies, but its published manifest still listed the full dependency tree, which made npm install `@x402/svm` and its older `@solana-program/*` packages (peer `@solana/kit@^5`) alongside `@solana/kit@6`, triggering "overriding peer dependency" warnings. The staged CLI package now publishes with no `dependencies`. The `x402-proxy-openclaw` plugin (unbundled) is unaffected.
+
 ## [0.12.1] - 2026-06-11
 
 ### Fixed
@@ -509,7 +515,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `appendHistory` / `readHistory` / `calcSpend` - JSONL transaction history
 - Re-exports from `@x402/fetch`, `@x402/svm`, `@x402/evm`
 
-[Unreleased]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.2...HEAD
+[0.12.2]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/cascade-protocol/x402-proxy/compare/v0.11.6...v0.12.0
 [0.11.6]: https://github.com/cascade-protocol/x402-proxy/compare/v0.11.5...v0.11.6

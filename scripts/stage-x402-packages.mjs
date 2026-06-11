@@ -74,7 +74,10 @@ const cliManifest = {
     "./package.json": "./package.json",
   },
   bin: sourcePackage.bin,
-  dependencies: sourcePackage.dependencies,
+  // CLI dist is fully bundled (only node: builtins are external), so it needs
+  // zero runtime deps. Publishing an empty list avoids npm peer-resolution noise
+  // on `npx x402-proxy`. The openclaw plugin (unbundled) keeps its deps below.
+  dependencies: {},
   keywords: (sourcePackage.keywords ?? []).filter(
     (keyword) => keyword !== "openclaw" && keyword !== "openclaw-plugin",
   ),
