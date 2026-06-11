@@ -114,7 +114,7 @@ export async function runSetup(opts?: {
   const protocol = await prompts.select({
     message: "Preferred payment protocol?",
     options: [
-      { value: "x402", label: "x402 - on-chain payments (Base, Solana)" },
+      { value: "x402", label: "x402 - on-chain payments (Base, Monad, Solana)" },
       { value: "mpp", label: "MPP - machine payments over HTTP 402 (Tempo)" },
     ],
   });

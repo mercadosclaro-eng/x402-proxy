@@ -82,7 +82,7 @@ Examples:
       },
       network: {
         kind: "parsed",
-        brief: "Require specific network (base, solana, tempo)",
+        brief: "Require specific network (base, monad, solana, tempo)",
         parse: String,
         optional: true,
       },

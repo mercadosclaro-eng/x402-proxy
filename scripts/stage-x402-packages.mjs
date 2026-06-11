@@ -65,7 +65,7 @@ const commonManifestFields = {
 const cliManifest = {
   name: "x402-proxy",
   description:
-    "curl for x402 paid APIs. Auto-pays any endpoint on Base, Solana, and Tempo.",
+    "curl for x402 paid APIs. Auto-pays any endpoint on Base, Monad, Solana, and Tempo.",
   ...commonManifestFields,
   main: "./dist/index.js",
   types: "./dist/index.d.ts",

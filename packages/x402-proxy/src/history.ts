@@ -151,6 +151,7 @@ export function explorerUrl(net: string, tx: string): string {
   if (net.startsWith("eip155:")) {
     const chainId = net.split(":")[1];
     if (chainId === "4217") return `https://explore.mainnet.tempo.xyz/tx/${tx}`;
+    if (chainId === "143") return `https://monadscan.com/tx/${tx}`;
     if (chainId === "8453") return `https://basescan.org/tx/${tx}`;
     return `https://basescan.org/tx/${tx}`;
   }
@@ -168,6 +169,7 @@ function shortModel(model: string): string {
 
 export function displayNetwork(net: string): string {
   if (net === "eip155:8453") return "Base";
+  if (net === "eip155:143") return "Monad";
   if (net === "eip155:4217") return "Tempo";
   if (net.startsWith("eip155:")) return `EVM (${net.split(":")[1]})`;
   if (net.startsWith("solana:")) return "Solana";
@@ -176,6 +178,7 @@ export function displayNetwork(net: string): string {
 
 function shortNetwork(net: string): string {
   if (net === "eip155:8453") return "base";
+  if (net === "eip155:143") return "monad";
   if (net === "eip155:4217") return "tempo";
   if (net.startsWith("eip155:")) return `evm:${net.split(":")[1]}`;
   if (net.startsWith("solana:")) return "sol";

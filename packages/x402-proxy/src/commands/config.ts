@@ -8,10 +8,10 @@ const VALID_KEYS: Record<
   { description: string; parse: (v: string) => unknown }
 > = {
   defaultNetwork: {
-    description: "Preferred network (base, solana, tempo)",
+    description: "Preferred network (base, monad, solana, tempo)",
     parse: (v) => {
-      if (!["base", "solana", "tempo"].includes(v)) {
-        throw new Error("Must be one of: base, solana, tempo");
+      if (!["base", "monad", "solana", "tempo"].includes(v)) {
+        throw new Error("Must be one of: base, monad, solana, tempo");
       }
       return v;
     },

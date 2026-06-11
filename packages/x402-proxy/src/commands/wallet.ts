@@ -9,8 +9,10 @@ import { resolveWallet } from "../lib/resolve-wallet.js";
 const BASE_RPC = "https://mainnet.base.org";
 const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
 const TEMPO_RPC = "https://rpc.presto.tempo.xyz";
+const MONAD_RPC = "https://rpc.monad.xyz";
 const USDC_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const USDC_TEMPO = "0x20C000000000000000000000b9537d11c60E8b50";
+const USDC_MONAD = "0x754704Bc059F8C67012fEd69BC8A327a5aafb603";
 const USDC_SOLANA_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const ATA_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
@@ -54,6 +56,18 @@ export async function fetchTempoBalances(address: string): Promise<{ usdc: strin
   return { usdc };
 }
 
+export async function fetchMonadBalances(address: string): Promise<{ mon: string; usdc: string }> {
+  const usdcData = `0x70a08231${address.slice(2).padStart(64, "0")}`;
+  const [monRes, usdcRes] = (await Promise.all([
+    rpcCall(MONAD_RPC, "eth_getBalance", [address, "latest"]),
+    rpcCall(MONAD_RPC, "eth_call", [{ to: USDC_MONAD, data: usdcData }, "latest"]),
+  ])) as [RpcResult, RpcResult];
+
+  const mon = monRes.result ? (Number(BigInt(monRes.result)) / 1e18).toFixed(6) : "?";
+  const usdc = usdcRes.result ? formatUsdcValue(Number(BigInt(usdcRes.result)) / 1e6) : "?";
+  return { mon, usdc };
+}
+
 async function getUsdcAta(owner: string): Promise<string> {
   const encoder = getAddressEncoder();
   const [ata] = await getProgramDerivedAddress({
@@ -90,21 +104,24 @@ export type AllBalances = {
   evm: { eth: string; usdc: string } | null;
   sol: { sol: string; usdc: string } | null;
   tempo: { usdc: string } | null;
+  monad: { mon: string; usdc: string } | null;
 };
 
 export async function fetchAllBalances(
   evmAddress?: string,
   solanaAddress?: string,
 ): Promise<AllBalances> {
-  const [evmResult, solResult, tempoResult] = await Promise.allSettled([
+  const [evmResult, solResult, tempoResult, monadResult] = await Promise.allSettled([
     evmAddress ? fetchEvmBalances(evmAddress) : Promise.resolve(null),
     solanaAddress ? fetchSolanaBalances(solanaAddress) : Promise.resolve(null),
     evmAddress ? fetchTempoBalances(evmAddress) : Promise.resolve(null),
+    evmAddress ? fetchMonadBalances(evmAddress) : Promise.resolve(null),
   ]);
   return {
     evm: evmResult.status === "fulfilled" ? evmResult.value : null,
     sol: solResult.status === "fulfilled" ? solResult.value : null,
     tempo: tempoResult.status === "fulfilled" ? tempoResult.value : null,
+    monad: monadResult.status === "fulfilled" ? monadResult.value : null,
   };
 }
 
@@ -140,11 +157,18 @@ export const walletInfoCommand = buildCommand<{ verbose: boolean }, [], CommandC
     console.log();
     console.log(pc.dim(`  Source: ${wallet.source}`));
 
-    const { evm, sol, tempo } = await fetchAllBalances(wallet.evmAddress, wallet.solanaAddress);
+    const { evm, sol, tempo, monad } = await fetchAllBalances(
+      wallet.evmAddress,
+      wallet.solanaAddress,
+    );
 
     if (wallet.evmAddress) {
       const bal = evm ? balanceLine(evm.usdc, evm.eth, "ETH") : pc.dim(" (network error)");
       console.log(`  Base:   ${pc.green(wallet.evmAddress)}${bal}`);
+    }
+    if (wallet.evmAddress) {
+      const bal = monad ? balanceLine(monad.usdc, monad.mon, "MON") : pc.dim(" (network error)");
+      console.log(`  Monad:  ${pc.green(wallet.evmAddress)}${bal}`);
     }
     if (wallet.evmAddress) {
       const bal = tempo ? pc.dim(` (${tempo.usdc} USDC)`) : pc.dim(" (network error)");

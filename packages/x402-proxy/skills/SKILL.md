@@ -5,7 +5,7 @@ description: Use x402-proxy CLI for consuming and debugging x402 and MPP paid AP
 
 # x402-proxy
 
-`curl` for x402 and MPP paid APIs with MCP proxy support. Auto-pays HTTP 402 on Base, Solana, and [Tempo](https://tempo.xyz/). Supports one-time payments (x402, MPP charge) and pay-per-token streaming (MPP sessions).
+`curl` for x402 and MPP paid APIs with MCP proxy support. Auto-pays HTTP 402 on Base, [Monad](https://monad.xyz/), Solana, and [Tempo](https://tempo.xyz/). Supports one-time payments (x402, MPP charge) and pay-per-token streaming (MPP sessions).
 
 ## Quick start
 
@@ -66,7 +66,7 @@ x402-proxy wallet export-key mnemonic   # bare mnemonic to stdout
 --method, -X <METHOD>     HTTP method (default: GET)
 --header, -H <KEY:VALUE>  Add request header (repeatable)
 --body, -d <DATA>         Request body (string or @file)
---network <NETWORK>       Force payment chain (base, solana, tempo)
+--network <NETWORK>       Force payment chain (base, monad, solana, tempo)
 --protocol <PROTOCOL>    Payment protocol (x402, mpp)
 --verbose                Show debug details (protocol negotiation, headers, payment flow)
 ```

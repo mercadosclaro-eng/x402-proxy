@@ -4,9 +4,9 @@
 [![license](https://img.shields.io/npm/l/x402-proxy.svg?style=flat-square)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-curl for x402 and MPP paid APIs with MCP proxy support. Auto-pays HTTP 402 on Base, Solana, and Tempo.
+curl for x402 and MPP paid APIs with MCP proxy support. Auto-pays HTTP 402 on Base, Monad, Solana, and Tempo.
 
-Zero crypto code on the buyer side. One mnemonic derives both EVM (Base/Tempo) and Solana keypairs - fund any chain and go. Supports one-time payments (x402, MPP charge) and pay-per-token streaming (MPP sessions). Use it as a CLI, an MCP proxy for AI agents, or as a Node.js library.
+Zero crypto code on the buyer side. One mnemonic derives both EVM (Base/Monad/Tempo) and Solana keypairs - fund any chain and go. Supports one-time payments (x402, MPP charge) and pay-per-token streaming (MPP sessions). Use it as a CLI, an MCP proxy for AI agents, or as a Node.js library.
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ npx x402-proxy https://surf.cascade.fyi/api/v1/twitter/user/openclaw
 
 That's it. The endpoint returns 402, x402-proxy pays and streams the response.
 
-No wallet? It'll walk you through setup automatically. One mnemonic derives both EVM (Base/Tempo) and Solana keypairs. Fund any chain and go.
+No wallet? It'll walk you through setup automatically. One mnemonic derives both EVM (Base/Monad/Tempo) and Solana keypairs. Fund any chain and go.
 
 ## Usage
 

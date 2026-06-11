@@ -189,7 +189,7 @@ Wallet is auto-generated on first run. No env vars needed.`,
       },
       network: {
         kind: "parsed",
-        brief: "Require specific network (base, solana, tempo)",
+        brief: "Require specific network (base, monad, solana, tempo)",
         parse: String,
         optional: true,
       },

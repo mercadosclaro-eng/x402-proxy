@@ -72,7 +72,7 @@ not listed above.`,
       },
       network: {
         kind: "parsed",
-        brief: "Preferred or required network (base, solana, tempo)",
+        brief: "Preferred or required network (base, monad, solana, tempo)",
         parse: String,
         optional: true,
       },
