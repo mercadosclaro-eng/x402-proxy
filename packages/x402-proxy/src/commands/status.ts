@@ -22,11 +22,18 @@ export async function displayStatus() {
     console.log(pc.yellow("  No wallet configured."));
     console.log(pc.dim(`  Run ${pc.cyan("$ npx x402-proxy setup")} to create one.`));
   } else {
-    const { evm, sol, tempo } = await fetchAllBalances(wallet.evmAddress, wallet.solanaAddress);
+    const { evm, sol, tempo, monad } = await fetchAllBalances(
+      wallet.evmAddress,
+      wallet.solanaAddress,
+    );
 
     if (wallet.evmAddress) {
       const bal = evm ? balanceLine(evm.usdc, evm.eth, "ETH") : pc.dim(" (network error)");
       console.log(`  Base:   ${pc.green(wallet.evmAddress)}${bal}`);
+    }
+    if (wallet.evmAddress) {
+      const bal = monad ? balanceLine(monad.usdc, monad.mon, "MON") : pc.dim(" (network error)");
+      console.log(`  Monad:  ${pc.green(wallet.evmAddress)}${bal}`);
     }
     if (wallet.evmAddress) {
       const bal = tempo ? pc.dim(` (${tempo.usdc} USDC)`) : pc.dim(" (network error)");
