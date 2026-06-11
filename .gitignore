@@ -12,3 +12,8 @@ dist/
 .claude/settings.local.json
 tmp/
 output/
+
+# npx skills install artifacts
+.agents/
+.claude/skills/
+skills-lock.json
