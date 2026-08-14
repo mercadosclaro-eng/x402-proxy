@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { computeMppVoucherTarget, detectProtocols, extractTxSignature } from "./handler.js";
+import {
+  computeMppVoucherTarget,
+  detectProtocols,
+  extractTxSignature,
+  splitSseFrames,
+} from "./handler.js";
 
 describe("detectProtocols", () => {
   it("detects MPP from WWW-Authenticate Payment header", () => {
@@ -101,5 +106,45 @@ describe("computeMppVoucherTarget", () => {
         headroom: 5_000_000n,
       }),
     ).toBe(3_000_000n);
+  });
+});
+
+describe("splitSseFrames", () => {
+  it("splits complete LF frames and keeps the trailing partial", () => {
+    const { frames, rest } = splitSseFrames("event: a\ndata: 1\n\nevent: b\ndata: 2\n\nevent: c");
+    expect(frames).toEqual(["event: a\ndata: 1", "event: b\ndata: 2"]);
+    expect(rest).toBe("event: c");
+  });
+
+  it("splits CRLF-framed streams", () => {
+    const { frames, rest } = splitSseFrames(
+      "event: a\r\ndata: 1\r\n\r\nevent: b\r\ndata: 2\r\n\r\n",
+    );
+    expect(frames).toEqual(["event: a\ndata: 1", "event: b\ndata: 2"]);
+    expect(rest).toBe("");
+  });
+
+  it("splits bare-CR framed streams", () => {
+    const { frames } = splitSseFrames("event: a\rdata: 1\r\rrest");
+    expect(frames).toEqual(["event: a\ndata: 1"]);
+  });
+
+  it("drops blank frames from keep-alive padding", () => {
+    const { frames } = splitSseFrames("\n\n\n\ndata: 1\n\n");
+    expect(frames).toEqual(["data: 1"]);
+  });
+
+  it("returns no frames until a terminator arrives", () => {
+    const { frames, rest } = splitSseFrames("data: partial");
+    expect(frames).toEqual([]);
+    expect(rest).toBe("data: partial");
+  });
+
+  it("reassembles a frame split across reads", () => {
+    const first = splitSseFrames("data: hel");
+    expect(first.frames).toEqual([]);
+    const second = splitSseFrames(`${first.rest}lo\n\n`);
+    expect(second.frames).toEqual(["data: hello"]);
+    expect(second.rest).toBe("");
   });
 });

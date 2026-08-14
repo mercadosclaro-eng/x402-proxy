@@ -157,6 +157,22 @@ function parseVoucherHeadroom(value: string | undefined): bigint {
   }
 }
 
+// Bound to mppx's own exports rather than hand-copied: a shape change upstream
+// must fail type-check here instead of surfacing as a runtime payment failure.
+type SessionReceipt = ReturnType<typeof Session.Precompile.Receipt.deserializeSessionReceipt>;
+type SseEvent = NonNullable<ReturnType<typeof Session.Precompile.SseProtocol.parseEvent>>;
+
+/**
+ * Split an SSE buffer into complete frames, returning the trailing partial frame.
+ * Normalizes CRLF/CR first: servers may frame with `\r\n\r\n`, which a bare
+ * `\n\n` split never matches, silently stalling the stream instead of erroring.
+ */
+export function splitSseFrames(buffer: string): { frames: string[]; rest: string } {
+  const parts = buffer.replace(/\r\n|\r/g, "\n").split("\n\n");
+  const rest = parts.pop() ?? "";
+  return { frames: parts.filter((part) => part.trim()), rest };
+}
+
 // --- MPP handler ---
 
 /**
@@ -196,15 +212,6 @@ export async function createMppProxyHandler(opts: {
     return { ...init, headers: { ...existing, "X-Payer-Address": payerAddress } };
   }
 
-  type SessionReceipt = {
-    method: string;
-    reference: string;
-    status: string;
-    timestamp: string;
-    acceptedCumulative?: string;
-    txHash?: string;
-    spent: string;
-  };
   type ActiveSession = {
     channelId?: string;
     cumulative: bigint;
@@ -388,20 +395,11 @@ export async function createMppProxyHandler(opts: {
             if (done) break;
 
             buffer += decoder.decode(value, { stream: true });
-            const parts = buffer.split("\n\n");
-            buffer = parts.pop() ?? "";
+            const { frames, rest } = splitSseFrames(buffer);
+            buffer = rest;
 
-            for (const part of parts) {
-              if (!part.trim()) continue;
-
-              const event = Session.Precompile.SseProtocol.parseEvent(part) as
-                | { type: "message"; data: string }
-                | {
-                    type: "payment-need-voucher";
-                    data: { channelId: string; requiredCumulative: string; deposit: string };
-                  }
-                | { type: "payment-receipt"; data: SessionReceipt }
-                | null;
+            for (const part of frames) {
+              const event: SseEvent | null = Session.Precompile.SseProtocol.parseEvent(part);
               if (!event) continue;
 
               switch (event.type) {

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.3] - 2026-08-14
+
+### Fixed
+
+- Restore MPP payments. Every `--protocol mpp` request failed against current MPP servers with `Payment verification failed: memo is not bound to this challenge.` mppx `>=0.6.28` derives the TIP-20 attribution memo's trailing nonce from `keccak256(challengeId)` and rejects any credential whose memo does not match, while the bundled mppx `0.5.1` still filled those bytes randomly. The memo version byte did not change across that break, so servers cannot distinguish an outdated client from a replay and correctly reject both. Bumped mppx to `0.8.17` (and `viem` to `^2.55.16` for its peer range). x402 payments were never affected.
+- Tolerate `\r\n` and `\r` line endings when framing MPP session SSE streams. Frames were split on `\n\n` only, so a server using CRLF framing produced no frames at all and the stream stalled silently instead of erroring.
+
+### Changed
+
+- MPP session receipt and SSE event types are now taken from mppx's own exports instead of hand-written local copies, so an upstream shape change fails type-check rather than surfacing as a runtime payment failure.
+
 ## [0.12.2] - 2026-06-11
 
 ### Fixed
@@ -515,7 +526,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `appendHistory` / `readHistory` / `calcSpend` - JSONL transaction history
 - Re-exports from `@x402/fetch`, `@x402/svm`, `@x402/evm`
 
-[Unreleased]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.2...HEAD
+[Unreleased]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.3...HEAD
+[0.12.3]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/cascade-protocol/x402-proxy/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/cascade-protocol/x402-proxy/compare/v0.11.6...v0.12.0
