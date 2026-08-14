@@ -315,7 +315,7 @@ export async function createMppProxyHandler(opts: {
           const receiptHeader = response.headers.get("Payment-Receipt");
           if (!receiptHeader) return undefined;
           try {
-            const receipt = Session.Receipt.deserializeSessionReceipt(receiptHeader);
+            const receipt = Session.Precompile.Receipt.deserializeSessionReceipt(receiptHeader);
             spent = spent > BigInt(receipt.spent) ? spent : BigInt(receipt.spent);
             return receipt;
           } catch {
@@ -394,7 +394,7 @@ export async function createMppProxyHandler(opts: {
             for (const part of parts) {
               if (!part.trim()) continue;
 
-              const event = Session.Sse.parseEvent(part) as
+              const event = Session.Precompile.SseProtocol.parseEvent(part) as
                 | { type: "message"; data: string }
                 | {
                     type: "payment-need-voucher";
@@ -442,7 +442,8 @@ export async function createMppProxyHandler(opts: {
                   const receiptHeader = voucherResponse.headers.get("Payment-Receipt");
                   if (receiptHeader) {
                     try {
-                      const receipt = Session.Receipt.deserializeSessionReceipt(receiptHeader);
+                      const receipt =
+                        Session.Precompile.Receipt.deserializeSessionReceipt(receiptHeader);
                       spent = spent > BigInt(receipt.spent) ? spent : BigInt(receipt.spent);
                     } catch {
                       // Ignore malformed receipt headers on voucher updates.
